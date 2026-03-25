@@ -1,10 +1,9 @@
 from jose import jwt
 from datetime import datetime, timedelta
+from backend.database import get_connection
 
 SECRET_KEY = "quantedge_secret"
 ALGORITHM = "HS256"
-
-users_db = {}
 
 
 def create_token(username):
@@ -16,19 +15,38 @@ def create_token(username):
 
 
 def signup(username, password):
-    if username in users_db:
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "INSERT INTO users (username, password) VALUES (?, ?)",
+            (username, password)
+        )
+        conn.commit()
+        return {"message": "User created successfully"}
+
+    except:
         return {"error": "User already exists"}
 
-    users_db[username] = password
-    return {"message": "User created successfully"}
+    finally:
+        conn.close()
 
 
 def login(username, password):
-    if username not in users_db:
-        return {"error": "User not found"}
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    if users_db[username] != password:
-        return {"error": "Invalid password"}
+    cursor.execute(
+        "SELECT * FROM users WHERE username=? AND password=?",
+        (username, password)
+    )
+
+    user = cursor.fetchone()
+    conn.close()
+
+    if not user:
+        return {"error": "Invalid username or password"}
 
     token = create_token(username)
 
