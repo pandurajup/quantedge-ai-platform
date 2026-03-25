@@ -11,11 +11,11 @@ def get_stock_data(symbol="RELIANCE.NS"):
 
         return {
             "symbol": symbol,
-            "open": float(latest["Open"]),
-            "high": float(latest["High"]),
-            "low": float(latest["Low"]),
-            "close": float(latest["Close"]),
-            "volume": int(latest["Volume"])
+            "open": float(latest["Open"].item()),
+            "high": float(latest["High"].item()),
+            "low": float(latest["Low"].item()),
+            "close": float(latest["Close"].item()),
+            "volume": int(latest["Volume"].item())
         }
 
     except Exception as e:
