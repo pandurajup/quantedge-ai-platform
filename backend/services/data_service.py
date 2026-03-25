@@ -1,5 +1,7 @@
 import yfinance as yf
 
+
+# 📊 Stock data (latest OHLC)
 def get_stock_data(symbol="RELIANCE.NS"):
     try:
         df = yf.download(symbol, period="1mo", interval="1d")
@@ -7,9 +9,7 @@ def get_stock_data(symbol="RELIANCE.NS"):
         if df.empty:
             return {"error": "No data found"}
 
-        # Reset index to avoid weird structures
         df = df.reset_index()
-
         latest = df.iloc[-1]
 
         def safe_float(value):
@@ -31,15 +31,29 @@ def get_stock_data(symbol="RELIANCE.NS"):
 
     except Exception as e:
         return {"error": str(e)}
+
+
+# 📈 Chart data (fixed version)
 def get_chart_data(symbol="AAPL"):
     try:
-        import yfinance as yf
-
         df = yf.download(symbol, period="1mo", interval="1d")
 
+        if df.empty:
+            return {"error": "No data found"}
+
+        # ✅ Fix: Ensure Close is handled correctly
+        close = df["Close"]
+
+        if hasattr(close, "values"):
+            prices = close.values.flatten().tolist()
+        else:
+            prices = []
+
+        dates = df.index.strftime("%Y-%m-%d").tolist()
+
         return {
-            "dates": df.index.strftime("%Y-%m-%d").tolist(),
-            "prices": df["Close"].tolist()
+            "dates": dates,
+            "prices": prices
         }
 
     except Exception as e:
