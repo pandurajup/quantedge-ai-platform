@@ -1,3 +1,4 @@
+import bcrypt
 from jose import jwt
 from datetime import datetime, timedelta
 from backend.database import get_connection
@@ -14,17 +15,30 @@ def create_token(username):
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
+# 🔐 HASH PASSWORD
+def hash_password(password: str):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+
+# 🔐 VERIFY PASSWORD
+def verify_password(password: str, hashed: bytes):
+    return bcrypt.checkpw(password.encode(), hashed)
+
+
 def signup(username, password):
     conn = get_connection()
     cursor = conn.cursor()
 
     try:
+        hashed = hash_password(password)
+
         cursor.execute(
             "INSERT INTO users (username, password) VALUES (?, ?)",
-            (username, password)
+            (username, hashed)
         )
         conn.commit()
-        return {"message": "User created successfully"}
+
+        return {"message": "User created securely"}
 
     except:
         return {"error": "User already exists"}
@@ -38,15 +52,21 @@ def login(username, password):
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT * FROM users WHERE username=? AND password=?",
-        (username, password)
+        "SELECT password FROM users WHERE username=?",
+        (username,)
     )
 
-    user = cursor.fetchone()
+    row = cursor.fetchone()
     conn.close()
 
-    if not user:
-        return {"error": "Invalid username or password"}
+    if not row:
+        return {"error": "User not found"}
+
+    stored_password = row[0]
+
+    # 🔐 Verify hashed password
+    if not verify_password(password, stored_password):
+        return {"error": "Invalid password"}
 
     token = create_token(username)
 
