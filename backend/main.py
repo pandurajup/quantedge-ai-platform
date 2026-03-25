@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
-
+from backend.database import create_users_table
 from backend.services.auth_service import signup, login
 from backend.services.data_service import get_stock_data, get_chart_data
 from backend.services.feature_service import get_features
@@ -17,7 +17,7 @@ ALGORITHM = "HS256"
 
 # 🚀 Initialize app
 app = FastAPI()
-
+create_users_table()
 # 🔥 Enable CORS
 app.add_middleware(
     CORSMiddleware,
