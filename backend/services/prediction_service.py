@@ -93,20 +93,23 @@ def get_top_picks():
         return {"error": str(e)}
 
 
-# 💰 Portfolio AI (capital allocation)
+# 💰 Portfolio AI (ONLY BUY stocks)
 def get_portfolio():
     try:
         picks_data = get_top_picks()
         picks = picks_data.get("top_picks", [])
 
-        if not picks:
-            return {"error": "No data available"}
+        # ✅ Filter only BUY stocks
+        buy_stocks = [s for s in picks if s["prediction"] == "BUY"]
 
-        total_confidence = sum([stock["confidence"] for stock in picks])
+        if not buy_stocks:
+            return {"error": "No BUY opportunities found"}
+
+        total_confidence = sum([stock["confidence"] for stock in buy_stocks])
 
         portfolio = []
 
-        for stock in picks:
+        for stock in buy_stocks:
             allocation = (stock["confidence"] / total_confidence) * 100
 
             portfolio.append({
