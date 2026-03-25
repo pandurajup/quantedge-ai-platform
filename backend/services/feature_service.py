@@ -1,5 +1,4 @@
 import yfinance as yf
-import pandas as pd
 
 def get_features(symbol="RELIANCE.NS"):
     try:
@@ -7,6 +6,9 @@ def get_features(symbol="RELIANCE.NS"):
 
         if df.empty:
             return {"error": "No data"}
+
+        # Reset index (important fix)
+        df = df.reset_index()
 
         # Indicators
         df["MA_10"] = df["Close"].rolling(10).mean()
@@ -18,13 +20,24 @@ def get_features(symbol="RELIANCE.NS"):
 
         latest = df.iloc[-1]
 
+        def safe_float(value):
+            try:
+                if hasattr(value, "values"):
+                    return float(value.values[0])
+                return float(value)
+            except:
+                return None
+
+        ma10 = safe_float(latest["MA_10"])
+        ma50 = safe_float(latest["MA_50"])
+
         return {
             "symbol": symbol,
-            "close": float(latest["Close"]),
-            "ma_10": float(latest["MA_10"]),
-            "ma_50": float(latest["MA_50"]),
-            "volatility": float(latest["Volatility"]),
-            "trend": "UP" if latest["MA_10"] > latest["MA_50"] else "DOWN"
+            "close": safe_float(latest["Close"]),
+            "ma_10": ma10,
+            "ma_50": ma50,
+            "volatility": safe_float(latest["Volatility"]),
+            "trend": "UP" if ma10 and ma50 and ma10 > ma50 else "DOWN"
         }
 
     except Exception as e:
