@@ -31,3 +31,16 @@ def get_stock_data(symbol="RELIANCE.NS"):
 
     except Exception as e:
         return {"error": str(e)}
+def get_chart_data(symbol="AAPL"):
+    try:
+        import yfinance as yf
+
+        df = yf.download(symbol, period="1mo", interval="1d")
+
+        return {
+            "dates": df.index.strftime("%Y-%m-%d").tolist(),
+            "prices": df["Close"].tolist()
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
