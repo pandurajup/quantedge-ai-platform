@@ -59,3 +59,8 @@ def top_picks():
 @app.get("/portfolio")
 def portfolio():
     return get_portfolio()
+from backend.services.data_service import get_chart_data
+
+@app.get("/chart/{symbol}")
+def chart(symbol: str):
+    return get_chart_data(symbol)
