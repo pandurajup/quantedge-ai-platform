@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from backend.services.auth_service import signup, login
 from backend.services.data_service import get_stock_data
 from backend.services.feature_service import get_features
 from backend.services.prediction_service import (
@@ -64,3 +64,10 @@ from backend.services.data_service import get_chart_data
 @app.get("/chart/{symbol}")
 def chart(symbol: str):
     return get_chart_data(symbol)
+@app.post("/signup")
+def signup_api(data: dict):
+    return signup(data["username"], data["password"])
+
+@app.post("/login")
+def login_api(data: dict):
+    return login(data["username"], data["password"])
