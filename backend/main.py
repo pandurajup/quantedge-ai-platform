@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from backend.services.data_service import get_stock_data
 from backend.services.feature_service import get_features
+from backend.services.prediction_service import predict_signal
 app = FastAPI()
 
 @app.get("/")
@@ -21,3 +22,6 @@ def stock(symbol: str):
 @app.get("/features/{symbol}")
 def features(symbol: str):
     return get_features(symbol)
+@app.get("/predict/{symbol}")
+def predict(symbol: str):
+    return predict_signal(symbol)
