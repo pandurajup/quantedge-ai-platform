@@ -7,15 +7,15 @@ def get_stock_data(symbol="RELIANCE.NS"):
         if df.empty:
             return {"error": "No data found"}
 
-        latest = df.tail(1)
+        latest = df.iloc[-1]
 
         return {
             "symbol": symbol,
-            "open": float(latest["Open"].values[0]),
-            "high": float(latest["High"].values[0]),
-            "low": float(latest["Low"].values[0]),
-            "close": float(latest["Close"].values[0]),
-            "volume": int(latest["Volume"].values[0])
+            "open": float(latest["Open"]),
+            "high": float(latest["High"]),
+            "low": float(latest["Low"]),
+            "close": float(latest["Close"]),
+            "volume": int(latest["Volume"])
         }
 
     except Exception as e:
