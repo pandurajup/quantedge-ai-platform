@@ -14,11 +14,11 @@ def predict_signal(symbol="RELIANCE.NS"):
         trend = data["trend"]
         volatility = data["volatility"]
 
-        # 🔥 Get sentiment
+        # 🌍 Get sentiment
         sentiment_data = get_sentiment(symbol)
         sentiment = sentiment_data.get("sentiment", "NEUTRAL")
 
-        # 🔥 ML Prediction
+        # 🧠 ML Prediction
         ml_signal = ml_predict(data)
 
         if ml_signal:
@@ -35,9 +35,7 @@ def predict_signal(symbol="RELIANCE.NS"):
             elif sentiment == "POSITIVE" and signal == "SELL":
                 confidence -= 10
 
-            # Keep confidence within bounds
             confidence = max(0, min(100, confidence))
-
             source = "ML + Sentiment"
 
         else:
@@ -70,7 +68,7 @@ def predict_signal(symbol="RELIANCE.NS"):
         return {"error": str(e)}
 
 
-# 🚀 ⭐ Top AI Picks (Multi-stock ranking)
+# ⭐ Top AI Picks (Multi-stock ranking)
 def get_top_picks():
     try:
         stocks = ["AAPL", "TSLA", "RELIANCE.NS", "TCS.NS", "INFY.NS"]
@@ -87,8 +85,38 @@ def get_top_picks():
         results = sorted(results, key=lambda x: x["confidence"], reverse=True)
 
         return {
-            "top_picks": results[:3],  # Top 3 best stocks
+            "top_picks": results[:3],
             "all": results
+        }
+
+    except Exception as e:
+        return {"error": str(e)}
+
+
+# 💰 Portfolio AI (capital allocation)
+def get_portfolio():
+    try:
+        picks_data = get_top_picks()
+        picks = picks_data.get("top_picks", [])
+
+        if not picks:
+            return {"error": "No data available"}
+
+        total_confidence = sum([stock["confidence"] for stock in picks])
+
+        portfolio = []
+
+        for stock in picks:
+            allocation = (stock["confidence"] / total_confidence) * 100
+
+            portfolio.append({
+                "symbol": stock["symbol"],
+                "prediction": stock["prediction"],
+                "allocation": round(allocation, 2)
+            })
+
+        return {
+            "portfolio": portfolio
         }
 
     except Exception as e:
