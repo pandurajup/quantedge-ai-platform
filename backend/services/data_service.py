@@ -7,15 +7,26 @@ def get_stock_data(symbol="RELIANCE.NS"):
         if df.empty:
             return {"error": "No data found"}
 
+        # Reset index to avoid weird structures
+        df = df.reset_index()
+
         latest = df.iloc[-1]
+
+        def safe_float(value):
+            try:
+                if hasattr(value, "values"):
+                    return float(value.values[0])
+                return float(value)
+            except:
+                return None
 
         return {
             "symbol": symbol,
-            "open": float(latest["Open"].item()),
-            "high": float(latest["High"].item()),
-            "low": float(latest["Low"].item()),
-            "close": float(latest["Close"].item()),
-            "volume": int(latest["Volume"].item())
+            "open": safe_float(latest["Open"]),
+            "high": safe_float(latest["High"]),
+            "low": safe_float(latest["Low"]),
+            "close": safe_float(latest["Close"]),
+            "volume": int(safe_float(latest["Volume"]) or 0)
         }
 
     except Exception as e:
