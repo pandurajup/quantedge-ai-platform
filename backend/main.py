@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.services.data_service import get_stock_data
 from backend.services.feature_service import get_features
 from backend.services.prediction_service import predict_signal, get_top_picks
+from backend.services.prediction_service import get_portfolio
 
 # 🚀 Initialize app
 app = FastAPI()
@@ -50,3 +51,6 @@ def predict(symbol: str):
 @app.get("/top-picks")
 def top_picks():
     return get_top_picks()
+@app.get("/portfolio")
+def portfolio():
+    return get_portfolio()
