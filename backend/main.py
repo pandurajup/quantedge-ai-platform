@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
+from backend.database import create_alerts_table
 
 # 📦 Database
 from backend.database import create_users_table, create_trades_table
@@ -34,7 +35,7 @@ app = FastAPI()
 # 🗄️ Initialize DB tables
 create_users_table()
 create_trades_table()
-
+create_alerts_table()
 
 # 🌐 Enable CORS
 app.add_middleware(
