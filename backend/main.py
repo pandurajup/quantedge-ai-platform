@@ -1,26 +1,42 @@
 from fastapi import FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from jose import jwt
-from backend.database import create_users_table
+
+# 📦 Database
+from backend.database import create_users_table, create_trades_table
+
+# 🔐 Auth
 from backend.services.auth_service import signup, login
+
+# 📊 Data + Features
 from backend.services.data_service import get_stock_data, get_chart_data
 from backend.services.feature_service import get_features
-from backend.services.prediction_service import
-from backend.database import create_trades_table(
+
+# 🧠 AI + Portfolio
+from backend.services.prediction_service import (
     predict_signal,
     get_top_picks,
     get_portfolio
 )
 
+# 💰 Trades (NEW)
+from backend.services.trade_service import save_trade, get_user_trades
+
+
 # 🔐 JWT Config
 SECRET_KEY = "quantedge_secret"
 ALGORITHM = "HS256"
 
+
 # 🚀 Initialize app
 app = FastAPI()
+
+# 🗄️ Initialize DB tables
 create_users_table()
 create_trades_table()
-# 🔥 Enable CORS
+
+
+# 🌐 Enable CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,6 +44,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # 🔐 Token verification
 def verify_token(authorization: str = Header(None)):
@@ -109,3 +126,30 @@ def portfolio(user=verify_token()):
     if not user:
         return {"error": "Unauthorized"}
     return get_portfolio()
+
+
+# 💾 Save Trade (NEW)
+@app.post("/trade")
+def trade(data: dict, user=verify_token()):
+    if not user:
+        return {"error": "Unauthorized"}
+
+    username = user["sub"]
+
+    return save_trade(
+        username,
+        data["symbol"],
+        data["action"],
+        data["price"]
+    )
+
+
+# 📊 Get User Trades (NEW)
+@app.get("/my-trades")
+def my_trades(user=verify_token()):
+    if not user:
+        return {"error": "Unauthorized"}
+
+    username = user["sub"]
+
+    return get_user_trades(username)
