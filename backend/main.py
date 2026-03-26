@@ -5,7 +5,8 @@ from backend.database import create_users_table
 from backend.services.auth_service import signup, login
 from backend.services.data_service import get_stock_data, get_chart_data
 from backend.services.feature_service import get_features
-from backend.services.prediction_service import (
+from backend.services.prediction_service import
+from backend.database import create_trades_table(
     predict_signal,
     get_top_picks,
     get_portfolio
@@ -18,6 +19,7 @@ ALGORITHM = "HS256"
 # 🚀 Initialize app
 app = FastAPI()
 create_users_table()
+create_trades_table()
 # 🔥 Enable CORS
 app.add_middleware(
     CORSMiddleware,
